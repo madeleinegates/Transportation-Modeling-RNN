@@ -1,0 +1,507 @@
+---
+title: "Data preprocessing"
+output: html_notebook
+---
+Loading libraries
+```{r}
+library(tidyverse)
+library(haven)
+library(readr)
+library(lubridate)
+```
+
+Uploading datasets
+```{r}
+dataset <- read_csv("dataset (1).csv")
+midas <- read_csv("midas_2012.csv")
+```
+
+
+```{r}
+x <- as.POSIXct(midas$ob_time, format="%d-%m-%Y %I:%M:%S") #convert to POSIX
+x <- data.frame(day   = format(x, "%d"), 
+           month = format(x, "%m"),
+           year  = format(x, "%Y"),
+           time  = format(x, "%T"))
+midas <- midas %>% select(-ob_time)
+midas <- cbind(x, midas)
+midas$time <- as.integer(midas$time)
+midas$month <- as.integer(midas$month)
+midas$day <- as.integer(midas$day)
+
+midas <- midas %>% select(c(day, month, year, time, wind_speed, visibility, 
+                            air_temperature, rltv_hum, drv_hr_sun_dur,
+                            snow_depth))
+midas %>% count(day, month, time, year) %>% filter(n > 1)
+```
+```{r}
+midas_full <- midas
+```
+
+```{r}
+midas <- read_csv("midas_2013.csv")
+x <- as.POSIXct(midas$ob_time, format="%d-%m-%Y %I:%M:%S") #convert to POSIX
+x <- data.frame(day   = format(x, "%d"), 
+           month = format(x, "%m"),
+           year  = format(x, "%Y"),
+           time  = format(x, "%T"))
+midas <- midas %>% select(-ob_time)
+midas <- cbind(x, midas)
+midas$time <- as.integer(midas$time)
+midas$month <- as.integer(midas$month)
+midas$day <- as.integer(midas$day)
+
+midas <- midas %>% select(c(day, month, year, time, wind_speed, visibility, 
+                            air_temperature, rltv_hum, drv_hr_sun_dur,
+                            snow_depth))
+midas %>% count(day, month, time, year) %>% filter(n > 1)
+```
+
+
+```{r}
+midas_full <- rbind(midas_full, midas)
+```
+
+```{r}
+midas <- read_csv("midas_2014.csv")
+x <- as.POSIXct(midas$ob_time, format="%d-%m-%Y %I:%M:%S") #convert to POSIX
+x <- data.frame(day   = format(x, "%d"), 
+           month = format(x, "%m"),
+           year  = format(x, "%Y"),
+           time  = format(x, "%T"))
+midas <- midas %>% select(-ob_time)
+midas <- cbind(x, midas)
+midas$time <- as.integer(midas$time)
+midas$month <- as.integer(midas$month)
+midas$day <- as.integer(midas$day)
+
+midas <- midas %>% select(c(day, month, year, time, wind_speed, visibility, 
+                            air_temperature, rltv_hum, drv_hr_sun_dur,
+                            snow_depth))
+midas %>% count(day, month, time, year) %>% filter(n > 1)
+```
+
+
+```{r}
+midas_full <- rbind(midas_full, midas)
+```
+
+```{r}
+midas <- read_csv("midas_2015.csv")
+x <- as.POSIXct(midas$ob_time, format="%d-%m-%Y %I:%M:%S") #convert to POSIX
+x <- data.frame(day   = format(x, "%d"), 
+           month = format(x, "%m"),
+           year  = format(x, "%Y"),
+           time  = format(x, "%T"))
+midas <- midas %>% select(-ob_time)
+midas <- cbind(x, midas)
+midas$time <- as.integer(midas$time)
+midas$month <- as.integer(midas$month)
+midas$day <- as.integer(midas$day)
+
+midas <- midas %>% select(c(day, month, year, time, wind_speed, visibility, 
+                            air_temperature, rltv_hum, drv_hr_sun_dur,
+                            snow_depth))
+midas %>% count(day, month, time, year) %>% filter(n > 1)
+```
+
+
+```{r}
+midas_full <- rbind(midas_full, midas)
+```
+
+```{r}
+midas_full <- midas_full %>% distinct()
+midas_full %>% count(day, month, time, year) %>% filter(n > 1)
+```
+
+
+```{r}
+midas <- read_csv("midas_rain_2012.csv")
+x <- as.POSIXct(midas$ob_end_time, format="%d-%m-%Y %I:%M:%S") #convert to POSIX
+x <- data.frame(day   = format(x, "%d"), 
+           month = format(x, "%m"),
+           year  = format(x, "%Y"),
+           time  = format(x, "%T"))
+midas <- midas %>% select(-ob_end_time)
+midas <- cbind(x, midas)
+midas$time <- as.integer(midas$time)
+midas$month <- as.integer(midas$month)
+midas$day <- as.integer(midas$day)
+midas <- midas %>% select(c(day, month, year, time, prcp_amt))
+midas <- midas %>% distinct()
+
+midas %>% count(day, month, time, year) %>% filter(n > 1)
+midas <- midas %>% group_by(day, month, time, year) %>% mutate(prcp_amt = max(prcp_amt)) %>% distinct()
+midas %>% count(day, month, time, year) %>% filter(n > 1)
+```
+
+
+```{r}
+midas_rain <- midas
+```
+
+```{r}
+midas <- read_csv("midas_rain_2013.csv")
+x <- as.POSIXct(midas$ob_end_time, format="%d-%m-%Y %I:%M:%S") #convert to POSIX
+x <- data.frame(day   = format(x, "%d"), 
+           month = format(x, "%m"),
+           year  = format(x, "%Y"),
+           time  = format(x, "%T"))
+midas <- midas %>% select(-ob_end_time)
+midas <- cbind(x, midas)
+midas$time <- as.integer(midas$time)
+midas$month <- as.integer(midas$month)
+midas$day <- as.integer(midas$day)
+midas <- midas %>% select(c(day, month, year, time, prcp_amt))
+midas %>% count(day, month, time, year) %>% filter(n > 1)
+midas <- midas %>% group_by(day, month, time, year) %>% mutate(prcp_amt = max(prcp_amt)) %>% distinct()
+midas %>% count(day, month, time, year) %>% filter(n > 1)
+```
+
+
+```{r}
+midas_rain <- rbind(midas_rain, midas)
+```
+```{r}
+midas <- read_csv("midas_rain_2014.csv")
+x <- as.POSIXct(midas$ob_end_time, format="%d-%m-%Y %I:%M:%S") #convert to POSIX
+x <- data.frame(day   = format(x, "%d"), 
+           month = format(x, "%m"),
+           year  = format(x, "%Y"),
+           time  = format(x, "%T"))
+midas <- midas %>% select(-ob_end_time)
+midas <- cbind(x, midas)
+midas$time <- as.integer(midas$time)
+midas$month <- as.integer(midas$month)
+midas$day <- as.integer(midas$day)
+midas <- midas %>% select(c(day, month, year, time, prcp_amt))
+midas %>% count(day, month, time, year) %>% filter(n > 1)
+midas <- midas %>% group_by(day, month, time, year) %>% mutate(prcp_amt = max(prcp_amt)) %>% distinct()
+midas %>% count(day, month, time, year) %>% filter(n > 1)
+```
+
+
+```{r}
+midas_rain <- rbind(midas_rain, midas)
+```
+```{r}
+midas <- read_csv("midas_rain_2015.csv")
+x <- as.POSIXct(midas$ob_end_time, format="%d-%m-%Y %I:%M:%S") #convert to POSIX
+x <- data.frame(day   = format(x, "%d"), 
+           month = format(x, "%m"),
+           year  = format(x, "%Y"),
+           time  = format(x, "%T"))
+midas <- midas %>% select(-ob_end_time)
+midas <- cbind(x, midas)
+midas$time <- as.integer(midas$time)
+midas$month <- as.integer(midas$month)
+midas$day <- as.integer(midas$day)
+midas <- midas %>% select(c(day, month, year, time, prcp_amt))
+midas %>% count(day, month, time, year) %>% filter(n > 1)
+midas <- midas %>% group_by(day, month, time, year) %>% mutate(prcp_amt = max(prcp_amt)) %>% distinct()
+midas %>% count(day, month, time, year) %>% filter(n > 1)
+```
+
+
+```{r}
+midas_rain <- rbind(midas_rain, midas)
+```
+```{r}
+midas_rain <- midas_rain %>% distinct()
+midas_full <- midas_full %>% distinct()
+```
+
+
+```{r}
+midas <- left_join(midas_full, midas_rain) %>% distinct()
+midas %>% count(day, month, time, year) %>% filter(n > 1)
+```
+```{r}
+remove(midas_full, midas_rain, x)
+```
+
+```{r}
+typeof(midas$year)
+typeof(dataset$travel_year)
+
+typeof(midas$month)
+typeof(dataset$travel_month)
+
+typeof(midas$day)
+typeof(dataset$travel_date)
+
+typeof(midas$time)
+typeof(dataset$start_time_linear)
+```
+
+```{r}
+midas$year <- as.double(midas$year)
+dataset$time <- floor(dataset$start_time_linear)
+
+
+colnames(dataset)[which(colnames(dataset) == "travel_date")] <- "day"
+colnames(dataset)[which(colnames(dataset) == "travel_month")] <- "month"
+colnames(dataset)[which(colnames(dataset) == "travel_year")] <- "year"
+```
+
+```{r}
+midas <- filter(midas, rowSums(is.na(midas)) != ncol(midas)) 
+summary(midas)
+```
+
+```{r}
+midas[is.na(midas$air_temperature),]
+midas$snow_depth <- ifelse(is.na(midas$snow_depth), 0, midas$snow_depth)
+midas <- midas %>% fill(c(air_temperature, rltv_hum, prcp_amt, drv_hr_sun_dur, wind_speed, visibility)) 
+```
+
+```{r}
+summary(midas)
+midas[midas$time == 24,]$time <- 0
+midas[nrow(midas) + 1,] = c(7, 11, 2013, 12, midas[midas$year == 2013 & midas$month == 11 & midas$day == 7 & midas$time == 11, 5:11])
+midas[nrow(midas) + 1,] = c(28, 10, 2014, 11, midas[midas$year == 2014 & midas$month == 10 & midas$day == 28 & midas$time == 10, 5:11])
+```
+
+```{r}
+df <- left_join(dataset, midas)
+```
+```{r}
+summary(df)
+```
+
+
+```{r}
+unique(df$purpose)
+df$home_work <- ifelse(df$purpose == "HBW", 1, 0)
+df$home_educ <- ifelse(df$purpose == "HBE", 1, 0)
+df$home_other <- ifelse(df$purpose == "HBO", 1, 0)
+df$employer <- ifelse(df$purpose == "B", 1, 0)
+df$non_home_other <- ifelse(df$purpose == "NHBO", 1, 0)
+df <- df %>% select(-purpose)
+```
+```{r}
+df <- df %>% select (-fueltype)
+```
+```{r}
+unique(df$faretype)
+df$full_fare <- ifelse(df$faretype == "full", 1, 0)
+df$dis_fare <- ifelse(df$faretype == "dis", 1, 0)
+df$child_fare <- ifelse(df$faretype == "child", 1, 0)
+df$free_fare <- ifelse(df$faretype == "free", 1, 0)
+df$over_16_fare <- ifelse(df$faretype == "16+", 1, 0)
+df <- df %>% select(-faretype)
+```
+```{r}
+unique(df$car_ownership)
+df$no_car <- ifelse(df$car_ownership == 0, 1, 0)
+df$under_one_car <- ifelse(df$car_ownership == 1, 1, 0)
+df$at_least_one_car <- ifelse(df$car_ownership == 2, 1, 0)
+df <- df %>% select(-car_ownership)
+```
+```{r}
+df$snow <- ifelse(df$snow_depth > 0, 1, 0)
+length(df[df$prcp_amt < 2 & df$prcp_amt > 0,]$trip_id)/length(df$trip_id)
+length(df[df$prcp_amt == 0,]$trip_id)/length(df$trip_id)
+length(df[df$prcp_amt > 2,]$trip_id)/length(df$trip_id)
+df$no_rain <- ifelse(df$prcp_amt == 0, 1, 0)
+df$light_rain <- ifelse(df$prcp_amt < 2 & df$prcp_amt > 0, 1, 0)
+df$rain <- ifelse(df$prcp_amt >= 2, 1, 0)
+df <- df %>% select(-c(snow_depth, prcp_amt))
+```
+
+```{r}
+summary(df)
+
+```
+
+
+Separate into train, dev, and test sets:
+```{r}
+set.seed(1)
+households <- as.vector(unique(df$household_id))
+hh <- sample(households, 2200)
+train <- df[!(df$household_id %in% hh), ]
+other <- df[df$household_id %in% hh, ]
+
+households <- as.vector(unique(other$household_id))
+test_hh <- sample(households, 1100)
+dev <- other[!(other$household_id %in% test_hh), ]
+test <- other[other$household_id %in% test_hh, ]
+```
+
+Check lengths
+```{r}
+length(dev$trip_id)/length(df$trip_id)
+length(test$trip_id)/length(df$trip_id)
+length(train$trip_id)/length(df$trip_id)
+```
+
+Normalize the training set:
+First, calculate mean, sd of variables:
+```{r}
+m.age <- mean(train$age)
+sd.age <- sqrt(var(train$age))
+
+train$age <- (train$age - m.age)/sd.age
+dev$age <- (dev$age - m.age)/sd.age
+test$age <- (test$age - m.age)/sd.age
+
+
+m.distance <- mean(train$distance)
+sd.distance <- sqrt(var(train$distance))
+
+train$distance <- (train$distance - m.distance)/sd.distance
+dev$distance <- (dev$distance - m.distance)/sd.distance
+test$distance <- (test$distance - m.distance)/sd.distance
+
+m.dur_walking <- mean(train$dur_walking)
+sd.dur_walking <- sqrt(var(train$dur_walking))
+
+train$dur_walking <- (train$dur_walking - m.dur_walking)/sd.dur_walking
+dev$dur_walking <- (dev$dur_walking - m.dur_walking)/sd.dur_walking
+test$dur_walking <- (test$dur_walking - m.dur_walking)/sd.dur_walking
+
+m.dur_cycling <- mean(train$dur_cycling)
+sd.dur_cycling <- sqrt(var(train$dur_cycling))
+
+train$dur_cycling <- (train$dur_cycling - m.dur_cycling)/sd.dur_cycling
+dev$dur_cycling <- (dev$dur_cycling - m.dur_cycling)/sd.dur_cycling
+test$dur_cycling <- (test$dur_cycling - m.dur_cycling)/sd.dur_cycling
+
+m.dur_pt_total <- mean(train$dur_pt_total)
+sd.dur_pt_total <- sqrt(var(train$dur_pt_total))
+
+train$dur_pt_total <- (train$dur_pt_total - m.dur_pt_total)/sd.dur_pt_total
+dev$dur_pt_total <- (dev$dur_pt_total - m.dur_pt_total)/sd.dur_pt_total
+test$dur_pt_total <- (test$dur_pt_total - m.dur_pt_total)/sd.dur_pt_total
+
+m.dur_pt_access <- mean(train$dur_pt_access)
+sd.dur_pt_access <- sqrt(var(train$dur_pt_access))
+
+train$dur_pt_access <- (train$dur_pt_access - m.dur_pt_access)/sd.dur_pt_access
+dev$dur_pt_access <- (dev$dur_pt_access - m.dur_pt_access)/sd.dur_pt_access
+test$dur_pt_access <- (test$dur_pt_access - m.dur_pt_access)/sd.dur_pt_access
+
+m.dur_pt_rail <- mean(train$dur_pt_rail)
+sd.dur_pt_rail <- sqrt(var(train$dur_pt_rail))
+
+train$dur_pt_rail <- (train$dur_pt_rail - m.dur_pt_rail)/sd.dur_pt_rail
+dev$dur_pt_rail <- (dev$dur_pt_rail - m.dur_pt_rail)/sd.dur_pt_rail
+test$dur_pt_rail <- (test$dur_pt_rail - m.dur_pt_rail)/sd.dur_pt_rail
+
+m.dur_pt_bus <- mean(train$dur_pt_bus)
+sd.dur_pt_bus <- sqrt(var(train$dur_pt_bus))
+
+train$dur_pt_bus <- (train$dur_pt_bus - m.dur_pt_bus)/sd.dur_pt_bus
+dev$dur_pt_bus <- (dev$dur_pt_bus - m.dur_pt_bus)/sd.dur_pt_bus
+test$dur_pt_bus <- (test$dur_pt_bus - m.dur_pt_bus)/sd.dur_pt_bus
+
+m.dur_pt_int_total <- mean(train$dur_pt_int_total)
+sd.dur_pt_int_total <- sqrt(var(train$dur_pt_int_total))
+
+train$dur_pt_int_total <- (train$dur_pt_int_total - m.dur_pt_int_total)/sd.dur_pt_int_total
+dev$dur_pt_int_total <- (dev$dur_pt_int_total - m.dur_pt_int_total)/sd.dur_pt_int_total
+test$dur_pt_int_total <- (test$dur_pt_int_total - m.dur_pt_int_total)/sd.dur_pt_int_total
+
+m.dur_pt_int_waiting <- mean(train$dur_pt_int_waiting)
+sd.dur_pt_int_waiting <- sqrt(var(train$dur_pt_int_waiting))
+
+train$dur_pt_int_waiting <- (train$dur_pt_int_waiting - m.dur_pt_int_waiting)/sd.dur_pt_int_waiting
+dev$dur_pt_int_waiting <- (dev$dur_pt_int_waiting - m.dur_pt_int_waiting)/sd.dur_pt_int_waiting
+test$dur_pt_int_waiting <- (test$dur_pt_int_waiting - m.dur_pt_int_waiting)/sd.dur_pt_int_waiting
+
+m.dur_pt_int_walking <- mean(train$dur_pt_int_walking)
+sd.dur_pt_int_walking <- sqrt(var(train$dur_pt_int_walking))
+
+train$dur_pt_int_walking <- (train$dur_pt_int_walking - m.dur_pt_int_walking)/sd.dur_pt_int_walking
+dev$dur_pt_int_walking <- (dev$dur_pt_int_walking - m.dur_pt_int_walking)/sd.dur_pt_int_walking
+test$dur_pt_int_walking <- (test$dur_pt_int_walking - m.dur_pt_int_walking)/sd.dur_pt_int_walking
+
+m.pt_n_interchanges <- mean(train$pt_n_interchanges)
+sd.pt_n_interchanges <- sqrt(var(train$pt_n_interchanges))
+
+train$pt_n_interchanges <- (train$pt_n_interchanges - m.pt_n_interchanges)/sd.pt_n_interchanges
+dev$pt_n_interchanges <- (dev$pt_n_interchanges - m.pt_n_interchanges)/sd.pt_n_interchanges
+test$pt_n_interchanges <- (test$pt_n_interchanges - m.pt_n_interchanges)/sd.pt_n_interchanges
+
+m.dur_driving <- mean(train$dur_driving)
+sd.dur_driving <- sqrt(var(train$dur_driving))
+
+train$dur_driving <- (train$dur_driving - m.dur_driving)/sd.dur_driving
+dev$dur_driving <- (dev$dur_driving - m.dur_driving)/sd.dur_driving
+test$dur_driving <- (test$dur_driving - m.dur_driving)/sd.dur_driving
+
+m.cost_transit <- mean(train$cost_transit)
+sd.cost_transit <- sqrt(var(train$cost_transit))
+
+train$cost_transit <- (train$cost_transit - m.cost_transit)/sd.cost_transit
+dev$cost_transit <- (dev$cost_transit - m.cost_transit)/sd.cost_transit
+test$cost_transit <- (test$cost_transit - m.cost_transit)/sd.cost_transit
+
+m.cost_driving_total <- mean(train$cost_driving_total)
+sd.cost_driving_total <- sqrt(var(train$cost_driving_total))
+
+train$cost_driving_total <- (train$cost_driving_total - m.cost_driving_total)/sd.cost_driving_total
+dev$cost_driving_total <- (dev$cost_driving_total - m.cost_driving_total)/sd.cost_driving_total
+test$cost_driving_total <- (test$cost_driving_total - m.cost_driving_total)/sd.cost_driving_total
+
+m.cost_driving_fuel <- mean(train$cost_driving_fuel)
+sd.cost_driving_fuel <- sqrt(var(train$cost_driving_fuel))
+
+train$cost_driving_fuel <- (train$cost_driving_fuel - m.cost_driving_fuel)/sd.cost_driving_fuel
+dev$cost_driving_fuel <- (dev$cost_driving_fuel - m.cost_driving_fuel)/sd.cost_driving_fuel
+test$cost_driving_fuel <- (test$cost_driving_fuel - m.cost_driving_fuel)/sd.cost_driving_fuel
+
+m.cost_driving_con_charge <- mean(train$cost_driving_con_charge)
+sd.cost_driving_con_charge <- sqrt(var(train$cost_driving_con_charge))
+
+train$cost_driving_con_charge <- (train$cost_driving_con_charge - m.cost_driving_con_charge)/sd.cost_driving_con_charge
+dev$cost_driving_con_charge <- (dev$cost_driving_con_charge - m.cost_driving_con_charge)/sd.cost_driving_con_charge
+test$cost_driving_con_charge <- (test$cost_driving_con_charge - m.cost_driving_con_charge)/sd.cost_driving_con_charge
+
+m.driving_traffic_percent <- mean(train$driving_traffic_percent)
+sd.driving_traffic_percent <- sqrt(var(train$driving_traffic_percent))
+
+train$driving_traffic_percent <- (train$driving_traffic_percent - m.driving_traffic_percent)/sd.driving_traffic_percent
+dev$driving_traffic_percent <- (dev$driving_traffic_percent - m.driving_traffic_percent)/sd.driving_traffic_percent
+test$driving_traffic_percent <- (test$driving_traffic_percent - m.driving_traffic_percent)/sd.driving_traffic_percent
+
+m.wind_speed <- mean(train$wind_speed)
+sd.wind_speed <- sqrt(var(train$wind_speed))
+
+train$wind_speed <- (train$wind_speed - m.wind_speed)/sd.wind_speed
+dev$wind_speed <- (dev$wind_speed - m.wind_speed)/sd.wind_speed
+test$wind_speed <- (test$wind_speed - m.wind_speed)/sd.wind_speed
+
+m.visibility <- mean(train$visibility)
+sd.visibility <- sqrt(var(train$visibility))
+
+train$visibility <- (train$visibility - m.visibility)/sd.visibility
+dev$visibility <- (dev$visibility - m.visibility)/sd.visibility
+test$visibility <- (test$visibility - m.visibility)/sd.visibility
+
+m.air_temperature <- mean(train$air_temperature)
+sd.air_temperature <- sqrt(var(train$air_temperature))
+
+train$air_temperature <- (train$air_temperature - m.air_temperature)/sd.air_temperature
+dev$air_temperature <- (dev$air_temperature - m.air_temperature)/sd.air_temperature
+test$air_temperature <- (test$air_temperature - m.air_temperature)/sd.air_temperature
+
+m.rltv_hum <- mean(train$rltv_hum)
+sd.rltv_hum <- sqrt(var(train$rltv_hum))
+
+train$rltv_hum <- (train$rltv_hum - m.rltv_hum)/sd.rltv_hum
+dev$rltv_hum <- (dev$rltv_hum - m.rltv_hum)/sd.rltv_hum
+test$rltv_hum <- (test$rltv_hum - m.rltv_hum)/sd.rltv_hum
+```
+
+```{r}
+write.csv(train, "train.csv")
+write.csv(dev, "dev.csv")
+write.csv(test, "test.csv")
+```
+
+
+
+
