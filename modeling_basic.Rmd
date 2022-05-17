@@ -1,0 +1,58 @@
+---
+title: "Modeling: regular methods"
+---
+
+```{r}
+library(tidyverse)
+library(nnet)
+library(mlogit)
+train <- read.csv("train.csv")
+colnames(train)
+```
+
+Random Utility Multinomial model
+```{r}
+train <- train %>% 
+   mutate(id = group_indices(., household_id, person_n))
+colnames(train)[18:20] <- c("dur_walk", "dur_cycle", "dur_pt")
+colnames(train)[28] <- "dur_drive"
+colnames(train)[29:30] <- c("cost_pt", "cost_drive")
+train$cost_walk <- 0
+train$cost_cycle <- 0
+
+train2 <- train %>% select(id, travel_mode, dur_walk, dur_cycle, dur_pt, dur_drive, 
+                           cost_pt, cost_drive, cost_walk, cost_cycle,
+                           age, female, bus_scale,
+                           start_time_linear, day_of_week, rain, snow, 
+                           air_temperature, home_work, home_educ, home_other,
+                           employer, rltv_hum)
+
+train.dta <- mlogit.data(train2, shape = "wide", choice = "travel_mode", 
+                         varying = 3:10, sep = "_",
+                         alt.levels=c("drive", "pt", "walk", "cycle"), 
+                         id = "id")
+
+colnames(train.dta)
+
+ml.train <- mlogit(travel_mode ~ cost | age + female + bus_scale + start_time_linear + day_of_week | dur, train.dta)
+summary(ml.train)
+```
+
+
+```{r}
+train$travel_mode <- relevel(train$travel_mode, ref = "walk")
+test <- multinom(travel_mode ~ distance + time + rain, train)
+summary(test)
+```
+
+Basic one-layer neural net
+
+```{r}
+train2 <- train %>% select(travel_mode, distance, rain, time, employer, age, female)
+ir.nn2 <- nnet(travel_mode ~ ., data = train2, size = 2, rang = 0.1,
+decay = 5e-4, maxit = 200)
+
+summary(ir.nn2)
+```
+
+
