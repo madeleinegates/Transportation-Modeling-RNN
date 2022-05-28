@@ -1,0 +1,103 @@
+---
+title: 'Modeling: Conditional Logit'
+---
+
+```{r }
+library(tidyverse)
+library(nnet)
+```
+
+Basic one-layer neural net
+(Conditional Logit)
+First, ensure that data has duration and cost parameters for each travel mode
+```{r}
+train <- read.csv("train_final.csv")
+colnames(train)[18:20] <- c("dur_walk", "dur_cycle", "dur_pt")
+colnames(train)[28:30] <- c("dur_drive", "cost_pt", "cost_drive")
+dev <- read.csv("dev_final.csv")
+colnames(dev)[18:20] <- c("dur_walk", "dur_cycle", "dur_pt")
+colnames(dev)[28:30] <- c("dur_drive", "cost_pt", "cost_drive")
+colnames(train)
+test <- read.csv("test_final.csv")
+colnames(test)[18:20] <- c("dur_walk", "dur_cycle", "dur_pt")
+colnames(test)[28:30] <- c("dur_drive", "cost_pt", "cost_drive")
+```
+
+Limit to parameters of interest, format travel mode variable
+```{r}
+train <- train[,6:55] %>% select(-c(year, month, day))
+dev <- dev[,6:55] %>% select(-c(year, month, day))
+test <- test[,6:55] %>% select(-c(year, month, day))
+
+train$travel_mode <- as.factor(train$travel_mode)
+dev$travel_mode <- as.factor(dev$travel_mode)
+test$travel_mode <- as.factor(test$travel_mode)
+
+train$Y <-  class.ind(train$travel_mode)
+dev$Y <-  class.ind(dev$travel_mode)
+test$Y <- class.ind(test$travel_mode)
+train <- train %>% select(-travel_mode, Y)
+```
+
+First pass model
+```{r}
+set.seed(1)
+nn1 <- nnet(Y ~ ., data = train[,2:47], 
+               size = 10, rang = 0.5, softmax = TRUE,
+               entropy = TRUE,
+               decay = 0.0001, maxit = 100)
+
+tbl <- as.data.frame(cbind(predict(nn1, test, type = "class"), as.vector(test$travel_mode)))
+tbl$correct <- ifelse(tbl$V1 == tbl$V2, 1, 0)
+mean(tbl$correct)
+summary(nn1)
+```
+
+Model with variation in # neurons
+```{r}
+set.seed(123)
+best.pred  <- NULL
+for(i in 1:19){
+  mod <- nnet(Y ~ ., data = train[,2:47],
+                size=i, softmax = TRUE,
+              rang = 0.5, entropy = TRUE,
+               decay = 0.001, maxit = 100)
+  tbl <- as.data.frame(cbind(predict(mod, dev, type = "class"), as.vector(dev$travel_mode)))
+  tbl$correct <- ifelse(tbl$V1 == tbl$V2, 1, 0)
+  best.pred[i] = mean(tbl$correct)
+}
+max(best.pred)
+which.max(best.pred)
+plot(best.pred) 
+```
+
+```{r}
+library(ggplot2)
+graphing <- as.data.frame(cbind(seq(1, 25), best.pred))
+colnames(graphing)[1] <- "size"
+myplot <- ggplot(graphing, aes(x = size, y = best.pred)) + 
+  geom_point() + geom_line() +
+  xlab("Number of neurons in hidden layer") +
+  ylab("Predictive Accuracy") +
+  theme_bw()
+ggsave("num_neurons.png", myplot, 
+  width = 9, height = 6, units = "in")
+```
+
+Variation in decay
+```{r}
+set.seed(123)
+best.pred  <- NULL
+decay_vec <- c(0.1, 0.01, 0.001, 0.0001)
+for(i in 1:4){
+  mod <- nnet(Y ~ ., data = train[,2:47],
+                size = 13, softmax = TRUE,
+              rang = 0.5, entropy = TRUE,
+               decay = decay_vec[i], maxit = 100)
+  tbl <- as.data.frame(cbind(predict(mod, dev2, type = "class"), as.vector(dev$travel_mode)))
+  tbl$correct <- ifelse(tbl$V1 == tbl$V2, 1, 0)
+  best.pred[i] = mean(tbl$correct)
+}
+max(best.pred)
+which.max(best.pred)
+```
