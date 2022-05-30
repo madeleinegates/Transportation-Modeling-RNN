@@ -73,7 +73,7 @@ plot(best.pred)
 
 ```{r}
 library(ggplot2)
-graphing <- as.data.frame(cbind(seq(1, 25), best.pred))
+graphing <- as.data.frame(cbind(seq(1, 19), best.pred))
 colnames(graphing)[1] <- "size"
 myplot <- ggplot(graphing, aes(x = size, y = best.pred)) + 
   geom_point() + geom_line() +
@@ -81,7 +81,7 @@ myplot <- ggplot(graphing, aes(x = size, y = best.pred)) +
   ylab("Predictive Accuracy") +
   theme_bw()
 ggsave("num_neurons.png", myplot, 
-  width = 9, height = 6, units = "in")
+ width = 9, height = 6, units = "in")
 ```
 
 Variation in decay
@@ -94,10 +94,27 @@ for(i in 1:4){
                 size = 13, softmax = TRUE,
               rang = 0.5, entropy = TRUE,
                decay = decay_vec[i], maxit = 100)
-  tbl <- as.data.frame(cbind(predict(mod, dev2, type = "class"), as.vector(dev$travel_mode)))
+  tbl <- as.data.frame(cbind(predict(mod, dev, type = "class"), as.vector(dev$travel_mode)))
   tbl$correct <- ifelse(tbl$V1 == tbl$V2, 1, 0)
   best.pred[i] = mean(tbl$correct)
 }
 max(best.pred)
 which.max(best.pred)
 ```
+
+```{r}
+ann <- nnet(Y ~ ., data = train[,2:47], 
+               size = 13, rang = 0.5, softmax = TRUE,
+               entropy = TRUE,
+               decay = 0.1, maxit = 100)
+
+tbl <- as.data.frame(cbind(predict(ann, dev, type = "class"), as.vector(dev$travel_mode)))
+tbl$correct <- ifelse(tbl$V1 == tbl$V2, 1, 0)
+mean(tbl$correct)
+```
+```{r}
+tbl <- as.data.frame(cbind(predict(ann, test, type = "class"), as.vector(test$travel_mode)))
+tbl$correct <- ifelse(tbl$V1 == tbl$V2, 1, 0)
+mean(tbl$correct)
+```
+
