@@ -1,1 +1,10 @@
+These files supplement the final project for CS 230.
 
+Files should be accessed in the following order:
+1. data_cleaning.Rmd
+2. datacleaning2.R
+3. modeling_ann.Rmd
+4. ANN_modeling.ipynb
+5. NN_modeling.ipynb
+6. timestep_prep.R
+7. embedded_modeling.ipynb
